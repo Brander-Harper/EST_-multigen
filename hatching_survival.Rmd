@@ -1,0 +1,115 @@
+---
+title: "Hatching/survival"
+author: "Sara J Hutton"
+date: "10/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(fmsb)
+library(psych)
+library(dplyr)
+library(emmeans)
+library(tidyr)
+library("DescTools")
+library("FSA")
+library("PMCMRplus")
+library(ggplot2)
+library(tidyverse)
+library(rstatix)
+library(drc)
+library(effects)
+library(PMCMRplus)
+
+set.seed(1512)
+
+```
+
+
+
+
+
+```{r}
+hatching_survival <- read.csv("~/Box-Box-Backup/Delta Science Program 2019-2021 team silverside/Silverside Lab/Multigenerational/Development+Growth/hatching_survival.csv")
+hatching_survival$Hatching_2dpe <- as.numeric(hatching_survival$Hatching_2dpe)
+hatching_survival$Hatching_3dpe <- as.numeric(hatching_survival$Hatching_3dpe)
+hatching_survival$Survival_4dpe <- as.numeric(hatching_survival$Survival_4dpe)
+hatching_survival$Chemical <- factor(hatching_survival$Chemical,  levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+
+summary(lm(Survival_4dpe ~ Chemical*as.factor(Salinity)*Generation, data = hatching_survival))
+
+
+na.omit(hatching_survival) %>% filter(Salinity == "10 PSU", Generation == "F0") %>% .$Hatching_2dpe %>% mean()
+h_2dpe6_f0 <- aov(Hatching_2dpe ~ Chemical, hatching_survival %>% filter(Salinity == "6 PSU", Generation == "F0"))
+summary(h_2dpe6_f0)
+
+h_2dpe10_f0 <- aov(Hatching_2dpe ~ Chemical, hatching_survival %>% filter(Salinity == "10 PSU", Generation == "F0"))
+summary(h_2dpe10_f0)
+
+h_2dpe6_f1 <- aov(Hatching_2dpe ~ Chemical, hatching_survival %>% filter(Salinity == "6 PSU", Generation == "F1"))
+summary(h_2dpe6_f1)
+
+h_2dpe10_f1 <- aov(Hatching_2dpe ~ Chemical, hatching_survival %>% filter(Salinity == "10 PSU", Generation == "F1"))
+summary(h_2dpe10_f1)
+
+h_3dpe6_f0 <- aov(Hatching_3dpe ~ Chemical, hatching_survival %>% filter(Salinity == "6 PSU", Generation == "F0"))
+summary(h_3dpe6_f0)
+
+h_3dpe10_f0 <- aov(Hatching_3dpe ~ Chemical, hatching_survival %>% filter(Salinity == "10 PSU", Generation == "F0"))
+summary(h_3dpe10_f0)
+
+h_3dpe6_f1 <- aov(Hatching_3dpe ~ Chemical, hatching_survival %>% filter(Salinity == "6 PSU", Generation == "F1"))
+summary(h_3dpe6_f1)
+
+h_3dpe10_f1 <- aov(Hatching_3dpe ~ Chemical, hatching_survival %>% filter(Salinity == "10 PSU", Generation == "F1"))
+summary(h_3dpe10_f1)
+
+
+h_4dpe6_f0 <- aov(Survival_4dpe ~ Chemical, hatching_survival %>% filter(Salinity == "6 PSU", Generation == "F0"))
+summary(h_4dpe6_f0)
+
+h_4dpe10_f0 <- aov(Survival_4dpe ~ Chemical, hatching_survival %>% filter(Salinity == "10 PSU", Generation == "F0"))
+summary(h_4dpe10_f0)
+
+h_4dpe6_f1 <- aov(Survival_4dpe ~ Chemical, hatching_survival %>% filter(Salinity == "6 PSU", Generation == "F1"))
+summary(h_4dpe6_f1)
+
+h_4dpe_f1 <- aov(Survival_4dpe ~ Chemical, hatching_survival %>% filter(Generation == "F1", Salinity == "10 PSU"))
+summary(h_4dpe_f1)
+na.omit(hatching_survival %>% filter(Salinity == "6 PSU", Generation == "F1")) %>% dunn_test(Survival_4dpe ~ Chemical, p.adjust.method = "bonferroni")
+TukeyHSD(h_4dpe_f1)     
+summary(lm(Survival_4dpe ~ Chemical, na.omit(hatching_survival %>% filter(Salinity == "10 PSU", Generation == "F0"))))
+```
+
+
+
+
+```{r}
+hatching_survival$Salinity <- factor(hatching_survival$Salinity, levels = c("6 PSU", "10 PSU"))
+
+ggplot(hatching_survival, aes(Chemical, Survival_4dpe * 100, fill = Chemical))+
+  stat_summary(geom = "bar", fun = mean, position = position_dodge(width = 0.5)) +
+  stat_summary(fun.data=mean_se, position=position_dodge(width=0.2),geom="errorbar")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  labs(title = "", 
+       y = "Survival %", 
+       x = "Chemical",
+       fill = "Chemical") +
+  facet_grid(Salinity ~ Generation) +
+  theme(axis.text.x= element_blank(), plot.title = element_text(hjust = 0.5, size = 18), 
+        legend.text=element_text(size=12), legend.title=element_text(size=14), 
+        axis.text.y= element_text(size=10), axis.ticks.x = element_blank(), axis.title.y = element_text(size = 14),  axis.title.x = element_text(size = 14), strip.text.x = element_text(size = 14), strip.text.y = element_text(size = 14))
+
+ggsave("survival.png", height = 5, width = 7)
+
+
+```
+
+

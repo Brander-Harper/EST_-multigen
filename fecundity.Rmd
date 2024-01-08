@@ -1,0 +1,117 @@
+---
+title: "fecundity"
+author: "Sara J Hutton"
+date: "11/6/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{r}
+library(fmsb)
+library(psych)
+library(dplyr)
+library(emmeans)
+library(tidyr)
+library("DescTools")
+library("FSA")
+library("PMCMRplus")
+library(ggplot2)
+library(tidyverse)
+library(rstatix)
+library(drc)
+library(effects)
+library(PMCMRplus)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+df_f <- read.csv("female_adult.csv")
+df_a <- read.csv("f0_adults.csv")
+set.seed(123)
+
+df_f$Chemical <- gsub("BIC", "BIF", df_f$Chemical)
+df_f$EF <- df_f$Embryos/df_f$Females
+
+df_f$Chemical <- factor(df_f$Chemical, levels = c("CTL", "BIF", "CYF", "CYH"))
+df_f$Salinity <- factor(df_f$Salinity, levels = c(6, 10))
+#df$sum <- df$sum*100
+df_f10 <- filter(df_f, Salinity == 10)
+df_f6 <- filter(df_f, Salinity == 6)
+
+dunn_test(df_f6, Embryos ~ Chemical)
+
+dunn_test(df_f10, Embryos ~ Chemical)
+
+
+
+hist(df_f$Embryos)
+hist(df_f6$Embryos)
+hist(df_f10$Embryos)
+ # + offset log(fmales)
+
+# Number of embryos spawned per female per tank. Is this different between the conrol and the chemicals within each salinity exposure. 
+
+summary(glm(Embryos ~ Chemical + offset(log(Females)), data = df_f %>% filter(Salinity == 6), family = poisson()))
+summary(glm(Embryos ~ Chemical + offset(log(Females)), data = df_f %>% filter(Salinity == 10), family = poisson()))
+
+## take exposenetial of estimate 
+e^2.23953
+e^0.80500
+e^0.92237 
+e^-1.10812
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+```{r}
+df_fs <- read.csv("fecundity.csv")
+df_fs$chemical <- df_fs$dpe
+df_fs$chemical <- gsub("CTL", "Control", df_fs$chemical)
+df_fs$chemical <- gsub("BIF", "Bifenthrin", df_fs$chemical)
+df_fs$chemical <- gsub("CYF", "Cyfluthrin", df_fs$chemical)
+df_fs$chemical <- gsub("CYH", "Cyhalothrin", df_fs$chemical)
+df_fs$Chemical <- df_fs$chemical
+df_fs$Salinity <- df_fs$salinity
+
+df_sr<- na.omit(read.csv("df_sex_ratio.csv") %>% dplyr::select(Chemical, Salinity, Sex_ratio))
+
+df_fs <- left_join(df_fs, df_sr, by = "Chemical")
+```
+
+
+```{r}
+ggplot(df_f, aes(Chemical, Embryos/Females , fill = Chemical))+
+  stat_summary(geom = "bar", fun = mean, position = position_dodge(width = 0.5)) +
+  stat_summary(fun.data=mean_se, position=position_dodge(width=0.2),geom="errorbar")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  labs(title = "", 
+       y = "Embryos per female", 
+       x = "Chemical",
+       fill = "Chemical") +
+  facet_wrap("Salinity") +
+  theme(axis.text.x= element_blank(), plot.title = element_text(hjust = 0.5, size = 18), 
+        legend.text=element_text(size=12), legend.title=element_text(size=14), 
+        axis.text.y= element_text(size=10), axis.ticks.x = element_blank(), axis.title.y = element_text(size = 14),  axis.title.x = element_text(size = 14), strip.text.x = element_text(size = 14), strip.text.y = element_text(size = 14))
+
+ggsave("fecundity.png", height = 5, width = 7)
+
+```
+
+

@@ -1,0 +1,181 @@
+---
+title: "Development F0"
+author: "Sara J Hutton"
+date: "10/6/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#
+```{r}
+library(fmsb)
+library(psych)
+library(dplyr)
+library(emmeans)
+library(tidyr)
+library("DescTools")
+library("FSA")
+library("PMCMRplus")
+library(ggplot2)
+library(tidyverse)
+library(rstatix)
+library(drc)
+library(effects)
+library(PMCMRplus)
+
+set.seed(1512)
+
+```
+
+
+
+```{r}
+f0_adults <- read.csv("f0_adults.csv")
+df_sex_ratio <- read.csv("df_sex_ratio.csv")
+fecundity_df <- read.csv("fecundity_df.csv")
+
+f0_adults$Chemical <- factor(f0_adults$Chemical, levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin") )
+df_sex_ratio$Chemical <- factor(df_sex_ratio$Chemical, levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin") )
+fecundity_df$Chemical <- factor(fecundity_df$Chemical, levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin") )
+
+```
+
+
+```{r}
+gsi_6 <- lm(GSI ~ Chemical*Salinity, f0_adults %>% filter(Sex == "M"))
+summary(gsi_6)
+DunnettTest(GSI ~ Chemical, f0_adults %>% filter(Salinity == 6, Sex == "M"))
+DunnettTest(GSI ~ Chemical, f0_adults %>% filter(Salinity == 6, Sex == "F"))
+gsi_10 <- aov(GSI ~ Chemical, f0_adults %>% filter(Salinity == 10))
+summary(gsi_10)
+DunnettTest(GSI ~ Chemical, f0_adults %>% filter(Salinity == 10, Sex == "M"))
+DunnettTest(GSI ~ Chemical, f0_adults %>% filter(Salinity == 10, Sex == "F"))
+
+hsi_6 <- aov(HIS ~ Chemical, f0_adults %>% filter(Salinity == 6))
+summary(hsi_6)
+DunnettTest(HIS ~ Chemical, f0_adults %>% filter(Salinity == 6, Sex == "M"))
+DunnettTest(HIS ~ Chemical, f0_adults %>% filter(Salinity == 6, Sex == "F"))
+hsi_10 <- aov(HIS ~ Chemical, f0_adults %>% filter(Salinity == 10))
+summary(hsi_10)
+DunnettTest(HIS ~ Chemical, f0_adults %>% filter(Salinity == 10, Sex == "M"))
+DunnettTest(HIS ~ Chemical, f0_adults %>% filter(Salinity == 10, Sex == "F"))
+
+hsi_6 <- aov(HIS ~ Chemical, f0_adults %>% filter(Salinity == 6))
+summary(hsi_6)
+hsi_10 <- aov(HIS ~ Chemical, f0_adults %>% filter(Salinity == 10))
+summary(hsi_10)
+
+f0_adults$cond_factor <- 100*f0_adults$Total_weight/(f0_adults$Length^3)
+
+cond_factor_6 <- aov(cond_factor ~ Chemical, f0_adults %>% filter(Salinity == 6))
+summary(cond_factor_6)
+DunnettTest(cond_factor ~ Chemical, f0_adults %>% filter(Salinity == 6, Sex == "M"))
+DunnettTest(cond_factor ~ Chemical, f0_adults %>% filter(Salinity == 6, Sex == "F"))
+cond_factor_10 <- aov(cond_factor ~ Chemical, f0_adults %>% filter(Salinity == 10))
+summary(cond_factor_10)
+DunnettTest(cond_factor ~ Chemical, f0_adults %>% filter(Salinity == 10, Sex == "M"))
+DunnettTest(cond_factor ~ Chemical, f0_adults %>% filter(Salinity == 10, Sex == "F"))
+
+ggplot(f0_adults, aes(Chemical, GSI, fill = Chemical))+
+  stat_summary(geom = "bar", fun = mean, position = position_dodge(width = 0.5)) +
+  stat_summary(fun.data=mean_se, position=position_dodge(width=0.2),geom="errorbar")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  facet_grid(Salinity ~ Sex) +
+  labs(y = "Gonadal somatic indiex") +
+  theme(axis.text.x= element_blank(), axis.ticks.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.text=element_text(size=11), legend.title=element_text(size=12), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("gsi_f0.png", height = 5, width = 7)
+
+ggplot(f0_adults, aes(Chemical, HIS, fill = Chemical))+
+  stat_summary(geom = "bar", fun = mean, position = position_dodge(width = 0.5)) +
+  stat_summary(fun.data=mean_se, position=position_dodge(width=0.2),geom="errorbar")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  facet_grid(Salinity ~ Sex) +
+  labs(y = "Histo somotaic Index") +
+  theme(axis.text.x= element_blank(), axis.ticks.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.text=element_text(size=11), legend.title=element_text(size=12), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("hs1_f0.png", height = 5, width = 7)
+
+ggplot(f0_adults, aes(Chemical, cond_factor, fill = Chemical))+
+  stat_summary(geom = "bar", fun = mean, position = position_dodge(width = 0.5)) +
+  stat_summary(fun.data=mean_se, position=position_dodge(width=0.2),geom="errorbar")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  facet_grid(Salinity ~ Sex) +
+  labs(y = "Condition Factor") +
+  theme(axis.text.x= element_blank(), axis.ticks.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.text=element_text(size=11), legend.title=element_text(size=12), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("cond_factor_f0.png", height = 5, width = 7)
+
+```
+
+
+
+```{r}
+df_sex_ratio %>% filter(Sex == "M")
+
+
+ggplot(df_sex_ratio, aes(Chemical, Sex_ratio, fill = Chemical))+
+  stat_summary(geom = "bar", fun = mean, position = position_dodge(width = 0.5)) +
+  stat_summary(fun.data=mean_se, position=position_dodge(width=0.2),geom="errorbar")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  facet_wrap("Salinity") +
+  labs(y = "Sex Ratio") +
+  theme(axis.text.x= element_blank(), axis.ticks.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.text=element_text(size=11), legend.title=element_text(size=12), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("sex_ratio_f0.png", height = 5, width = 7)
+
+
+
+```
+fecundity_df
+
+
+
+
+```{r}
+#fecundity_df 
+summary(fec6 <- aov(Embryos ~ Chemical, fecundity_df %>% filter(Salinity == 6)))
+summary(fec10 <- aov(Embryos ~ Chemical, fecundity_df %>% filter(Salinity == 10)))
+
+
+ggplot(fecundity_df, aes(Chemical, Embryos, fill = Chemical))+
+  stat_summary(geom = "bar", fun = mean, position = position_dodge(width = 0.5)) +
+  stat_summary(fun.data=mean_se, position=position_dodge(width=0.2),geom="errorbar")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  facet_wrap("Salinity") +
+  labs(y = "Embryos per female") +
+  theme(axis.text.x= element_blank(), axis.ticks.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.text=element_text(size=11), legend.title=element_text(size=12), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("embryos_f0.png", height = 5, width = 7)
+
+
+
+```

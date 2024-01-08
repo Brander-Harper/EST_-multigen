@@ -1,0 +1,409 @@
+---
+title: "DS Multigenerational Study: Gene Expression Analysis"
+author: "Sara J Hutton"
+date: "9/30/2022"
+output: html_document
+---
+
+
+bind sample IDs and ddCT data. ddCT calculated in excel.
+
+
+
+
+```{r}
+set.seed(123)
+df <- read.csv("ddCT.csv")
+
+
+
+hist(df$ddCT)
+
+df$Salinity <- gsub(6, "6 PSU", df$Salinity)
+df$Salinity <- gsub(10, "10 PSU", df$Salinity)
+df$Salinity <- factor(df$Salinity,  levels = c("6 PSU", "10 PSU"))
+set.seed(123)
+
+df$Chemical <- factor(df$Chemical,  levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+set.seed(123)
+#1
+arx_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "arx"))
+summary(arx_6_0)
+DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "arx"))
+#2
+HSD17_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "17bHSD"))
+summary(HSD17_6_0)
+DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "17bHSD"))
+#3
+igf2_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "igf2"))
+summary(igf2_6_0)
+#4
+atp1_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "atp1"))
+summary(atp1_6_0)
+DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "atp1"))
+#5
+atp2_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "atp2"))
+summary(atp2_6_0)
+#6
+cyp1a1_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "cyp1a1"))
+summary(cyp1a1_6_0)
+#7
+rps6_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "rps6"))
+summary(rps6_6_0)
+DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "rps6"))
+#8
+dnmt3_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "dnmt3"))
+summary(dnmt3_6_0)
+#9
+esr_6_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 0, Gene == "esr"))
+summary(esr_6_0)
+
+
+df %>% filter(Gene == "cyp1a1", Chemical == "Control") %>%
+  t_test(ddCT ~ (Salinity)) %>%
+  adjust_pvalue(method = "bonferroni") %>%
+  add_significance("p.adj")
+```
+
+
+
+```{r}
+set.seed(123)
+df <- read.csv("ddCT.csv")
+
+df$Salinity <- gsub("6", "6 PSU", df$Salinity)
+
+df$Chemical <- factor(df$Chemical,  levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+
+#1
+arx_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "arx"))
+summary(arx_10_0)
+DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == 10, Generation == 0, Gene == "arx"))
+#2
+HSD17_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "17bHSD"))
+summary(HSD17_10_0)
+#DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == 10, Generation == 0, Gene == "17bHSD"))
+#3
+igf2_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "igf2"))
+summary(igf2_10_0)
+#4
+atp1_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "atp1"))
+summary(atp1_10_0)
+#DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "atp1"))
+#5
+atp2_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "atp2"))
+summary(atp2_10_0)
+DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "atp2"))
+#6
+cyp1a1_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "cyp1a1"))
+summary(cyp1a1_10_0)
+#7
+rps6_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "rps6"))
+summary(rps6_10_0)
+#DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "rps6"))
+#8
+dnmt3_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "dnmt3"))
+summary(dnmt3_10_0)
+#9
+esr_10_0 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 0, Gene == "esr"))
+summary(esr_10_0)
+
+```
+
+
+```{r}
+set.seed(123)
+df <- read.csv("ddCT.csv")
+
+df$Salinity <- gsub("6", "6 PSU", df$Salinity)
+
+df$Chemical <- factor(df$Chemical,  levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+
+#1
+arx_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "arx"))
+summary(arx_6_1)
+#DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "arx"))
+#2
+HSD17_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "17bHSD"))
+summary(HSD17_6_1)
+DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "17bHSD"))
+#3
+igf2_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "igf2"))
+summary(igf2_6_1)
+DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "igf2"))
+#4
+atp1_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "atp1"))
+summary(atp1_6_1)
+#DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "atp1"))
+#5
+atp2_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "atp2"))
+summary(atp2_6_1)
+#6
+cyp1a1_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "cyp1a1"))
+summary(cyp1a1_6_1)
+DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "cyp1a1"))
+#7
+rps6_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "rps6"))
+summary(rps6_6_1)
+DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "rps6"))
+#8
+dnmt3_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "dnmt3"))
+summary(dnmt3_6_1)
+#9
+esr_6_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == "6 PSU", Generation == 1, Gene == "esr"))
+summary(esr_6_1)
+
+```
+
+
+
+
+
+```{r}
+set.seed(123)
+df <- read.csv("ddCT.csv")
+
+df$Salinity <- gsub("6", "6 PSU", df$Salinity)
+
+df$Chemical <- factor(df$Chemical,  levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+
+#1
+arx_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "arx"))
+summary(arx_10_1)
+DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == 10, Generation == 1, Gene == "arx"))
+#2
+HSD17_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "17bHSD"))
+summary(HSD17_10_1)
+#DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == 10, Generation == 1, Gene == "17bHSD"))
+#3
+igf2_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "igf2"))
+summary(igf2_10_1)
+DunnettTest(ddCT ~ as.factor(Chemical), df %>% filter(Salinity == 10, Generation == 1, Gene == "igf2"))
+#4
+atp1_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "atp1"))
+summary(atp1_10_1)
+#DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "atp1"))
+#5
+atp2_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "atp2"))
+summary(atp2_10_1)
+DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "atp2"))
+#6
+cyp1a1_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "cyp1a1"))
+summary(cyp1a1_10_1)
+#7
+rps6_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "rps6"))
+summary(rps6_10_1)
+#DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "rps6"))
+#8
+dnmt3_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "dnmt3"))
+summary(dnmt3_10_1)
+DunnettTest(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "dnmt3"))
+#9
+esr_10_1 <- aov(ddCT ~ Chemical, df %>% filter(Salinity == 10, Generation == 1, Gene == "esr"))
+summary(esr_10_1)
+
+```
+
+
+
+```{r}
+
+df <- read.csv("ddCT.csv")
+df$Salinity <- gsub("6", "6 PSU", df$Salinity)
+
+df$Salinity <- gsub("10", "10 PSU", df$Salinity)
+
+df$Gene <- gsub("dnmt3", "dnmt3a", df$Gene)
+
+df$Gene <- gsub("17bHSD", "17β-hsd", df$Gene)
+
+df$Gene <- gsub("atp1", "atp1a1", df$Gene)
+
+df$Gene <- gsub("atp2", "atp1a2", df$Gene)
+
+df$Salinity <- factor(df$Salinity, levels = c("6 PSU", "10 PSU"))
+df$Chemical <- factor(df$Chemical,  levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+
+ggplot(df %>% filter(Generation == 0), aes(Chemical, ddCT, fill = Chemical))+
+  geom_boxplot(aes(Chemical, ddCT, fill = Chemical), outlier.color = "grey55")+
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  facet_grid(Salinity ~ Gene) +
+  labs(y = "F0 ddCT", x = "Pyrethroid", fill = "Pyrethroid") +
+  theme(axis.text.x= element_text(size=12, angle = 90), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.position="none", 
+        legend.text=element_blank(), legend.title=element_blank(), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("ddCT_0.png", height = 5, width = 7)
+
+
+ggplot(df %>% filter(Salinity == 10, Generation == 0, Chemical != "Control"), aes(Gene, ddCT, fill = Gene))+
+  geom_boxplot(aes(Gene, ddCT, fill = Gene))+
+  scale_fill_manual(values = c("darkgoldenrod1", "royalblue1", "magenta", "springgreen4", "coral2", "darkolivegreen", "slateblue1", "midnightblue", "orangered")) +
+  theme_bw()+
+  facet_grid(Salinity ~ Chemical) +
+  labs(y = "ddCT", x = "Gene", fill = "Gene") +
+  theme(axis.text.x= element_text(size=12, angle = 90), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("ddCT_10_0.png", height = 5, width = 7)
+
+
+ggplot(df %>% filter(Generation == 1), aes(Chemical, ddCT, fill = Chemical))+
+  geom_boxplot(aes(Chemical, ddCT, fill = Chemical), outlier.color = "grey55")+
+  scale_fill_manual(values = c("darkgoldenrod1", "royalblue1", "slateblue1", "springgreen4")) +
+  theme_bw()+
+  facet_grid(Salinity ~ Gene) +
+  labs(y = "F1 ddCT", x = "Pyrethroid", fill = "Pyrethroid") +
+  theme(axis.text.x= element_text(size=12, angle = 90), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.position="none", 
+        legend.text=element_blank(), legend.title=element_blank(), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("ddCT_1.png", height = 5, width = 7)
+
+
+ggplot(df %>% filter(Salinity == 10, Generation == 1, Chemical != "Control"), aes(Gene, ddCT, fill = Gene))+
+  geom_boxplot(aes(Gene, ddCT, fill = Gene))+
+  scale_fill_manual(values = c("darkgoldenrod1", "royalblue1", "slateblue1", "green", "coral2", "darkolivegreen", "darkmagenta", "dodgerblue", "forestgreen")) +
+  theme_bw()+
+  facet_wrap("Chemical") +
+  labs(y = "ddCT", x = "Gene", fill = "Gene") +
+  theme(axis.text.x= element_blank(), axis.ticks.x = element_blank(), 
+        plot.title = element_text(hjust = 0.5, size = 14),
+        plot.subtitle = element_text(hjust = 0.5, size = 10),
+        legend.text=element_text(size=11), legend.title=element_text(size=12), 
+        axis.text.y= element_text(size=12), axis.title.x = element_text(size = 14), axis.title.y = element_text(size = 14), strip.text.x = element_text(size = 12),strip.text.y = element_text(size = 12))
+
+ggsave("ddCT_10_1.png", height = 5, width = 7)
+
+
+```
+
+
+
+
+
+
+```{r}
+set.seed(123)
+df <- read.csv("ddCT.csv")
+
+df$Chemical <- factor(df$Chemical,  levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+
+#1
+arx_1 <- aov(ddCT ~ Chemical*Salinity, df %>% filter(Generation == 1, Gene == "arx"))
+summary(arx_1)
+#TukeyHSD(arx_1)
+#2
+arx_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "arx"))
+summary(arx_0)
+TukeyHSD(arx_0)
+
+#3
+bHSD_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "17bHSD"))
+summary(bHSD_1)
+TukeyHSD(bHSD_1)
+
+#4 Bifenthrin 17bHSD increased gene expression in 10 PSU Bifenthrin to Control
+bHSD_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "17bHSD"))
+summary(bHSD_0)
+TukeyHSD(bHSD_0)
+
+#5 # sig dif between cyf and cyh 6 psu 
+igf2_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "igf2"))
+summary(igf2_1)
+TukeyHSD(igf2_1)
+
+#6 
+igf2_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "igf2"))
+summary(igf2_0)
+#TukeyHSD(igf2_0)
+
+#7
+atp1_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "atp1"))
+summary(atp1_1)
+#TukeyHSD(atp1_1)
+
+#8
+atp1_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "atp1"))
+summary(atp1_0)
+TukeyHSD(atp1_0)
+
+#9
+atp2_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "atp2"))
+summary(atp2_1)
+#TukeyHSD(atp1_1)
+
+#10
+atp2_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "atp2"))
+summary(atp2_1)
+#TukeyHSD(igf2_0)
+
+#11
+rps6_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "rps6"))
+summary(rps6_1)
+TukeyHSD(rps6_1)
+
+#12
+rps6_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "rps6"))
+summary(rps6_0)
+TukeyHSD(rps6_0)
+
+#13
+esr_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "esr"))
+summary(esr_1)
+#TukeyHSD(esr_1)
+
+#14
+esr_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "esr"))
+summary(esr_0)
+#TukeyHSD(rps6_0)
+
+#15
+dnmt3_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "dnmt3"))
+summary(dnmt3_1)
+TukeyHSD(dnmt3_1)
+
+#16
+dnmt3_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "dnmt3"))
+summary(dnmt3_0)
+TukeyHSD(dnmt3_0)
+
+#17
+cyp1a1_1 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 1, Gene == "cyp1a1"))
+summary(cyp1a1_1)
+TukeyHSD(cyp1a1_1)
+
+#18
+cyp1a1_0 <- aov(ddCT ~ Chemical*as.factor(Salinity), df %>% filter(Generation == 0, Gene == "cyp1a1"))
+summary(cyp1a1_0)
+#TukeyHSD(cyp1a1_0)
+
+```
+
+
+
+```{r}
+set.seed(123)
+df <- read.csv("ddCT.csv")
+df <- df %>% group_by(Gene) %>%
+  mutate(row = row_number()) %>%
+  tidyr::pivot_wider(names_from=Gene,values_from=ddCT) %>%
+  dplyr::select(-row)
+
+df$treat <- paste0(df$Salinity, "_", df$Chemical, "_F", df$Generation)
+
+df_pca <- df[, c(4:12)]
+
+#rownames(df_pca) <- df_pca$treat
+
+pca <- prcomp(df_pca)
+```

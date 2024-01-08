@@ -1,0 +1,52 @@
+---
+title: "AChE"
+author: "Sara J Hutton"
+date: "8/14/2022"
+output: html_document
+---
+
+```{r}
+ache_df <- read.csv("final_df.csv")
+
+ache_df$Chemical <- factor(ache_df$Chemical, levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+
+ache_df$Salinity <- factor(ache_df$Salinity, levels = c("6 PSU", "10 PSU"))
+
+
+hist(ache_df$nM.min.mg.protein)
+
+summary(aov(nM.min.mg.protein ~ as.factor(Chemical), ache_df %>% filter(Generation == 'F0', Salinity == '6 PSU')))
+DunnettTest(nM.min.mg.protein ~ as.factor(Chemical), ache_df %>% filter(Generation == 'F0', Salinity == '6 PSU'))
+summary(aov(nM.min.mg.protein ~ as.factor(Chemical), ache_df %>% filter(Generation == 'F0', Salinity == '10 PSU')))
+summary(aov(nM.min.mg.protein ~ as.factor(Chemical), ache_df %>% filter(Generation == 'F1', Salinity == '6 PSU')))
+summary(aov(nM.min.mg.protein ~ as.factor(Chemical), ache_df %>% filter(Generation == 'F1', Salinity == '10 PSU')))
+summary(ache)
+
+```
+
+
+```{r}
+
+ggplot(ache_df, aes(Chemical, nM.min.mg.protein))+
+#  geom_point(aes(color = as.factor(type)), size = 0.002) + 
+  stat_summary(aes(fill = (Chemical)), position = position_dodge(), fun = "mean", geom = "bar") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = position_dodge()) +
+  theme_bw() +
+  labs(title = "", 
+       y = "nmol / min / mg protein", 
+       x = "Chemical",
+       fill = "Chemical") +
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  facet_grid(Salinity ~ Generation) +
+  theme(axis.text.x= element_blank(), plot.title = element_text(hjust = 0.5, size = 18), 
+        legend.text=element_text(size=12), legend.title=element_text(size=14), 
+        axis.text.y= element_text(size=10), axis.ticks.x = element_blank(), axis.title.y = element_text(size = 14),  axis.title.x = element_text(size = 14), strip.text.x = element_text(size = 14), strip.text.y = element_text(size = 14))
+
+ggsave("ache.png", height = 4, width  = 6)
+
+
+
+```
+
+
+

@@ -1,0 +1,89 @@
+---
+title: "larvae growth"
+author: "Sara J Hutton"
+date: "11/4/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(fmsb)
+library(psych)
+library(dplyr)
+library(emmeans)
+library(tidyr)
+library("DescTools")
+library("FSA")
+library("PMCMRplus")
+library(ggplot2)
+library(tidyverse)
+library(rstatix)
+library(drc)
+library(effects)
+library(PMCMRplus)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+df_g <- read.csv("growth_larvae.csv") %>% filter(index <= 4 , index >= 0.1)
+
+
+df_g$chemical <- gsub("CTL", "Control", df_g$chemical)
+df_g$chemical <- gsub("BIF", "Bifenthrin", df_g$chemical)
+df_g$chemical <- gsub("CYF", "Cyfluthrin", df_g$chemical)
+df_g$chemical <- gsub("CYH", "Cyhalothrin", df_g$chemical)
+
+
+#df_g$salinity <- gsub("6", "6 PSU", df_g$salinity)
+df_g$salinity <- gsub("10", "10 PSU", df_g$salinity)
+df_g$generation <- gsub("0", "F0", df_g$generation)
+df_g$generation <- gsub("1", "F1", df_g$generation)
+
+
+df_g$chemical <- factor(df_g$chemical, levels = c("Control", "Bifenthrin", "Cyfluthrin", "Cyhalothrin"))
+hist(df_g$index)
+summary(aov(index ~ chemical, df_g %>% filter(generation == "F0", salinity == 6)))
+summary(aov(index ~ chemical, df_g %>% filter(generation == "F0", salinity == 10)))
+summary(aov(index ~ chemical, df_g %>% filter(generation == "F1", salinity == 6)))
+DunnettTest(index ~ as.factor(chemical), df_g %>% filter(generation == "F1", salinity == "6"))
+summary(aov(index ~ chemical, df_g %>% filter(generation == "F1", salinity == 10)))
+DunnettTest(index ~ as.factor(chemical), df_g %>% filter(generation == "F1", salinity == 10))
+hist(df_g$index)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+
+
+ggplot(df_g, aes(chemical, index))+
+#  geom_point(aes(color = as.factor(type)), size = 0.002) + 
+  stat_summary(aes(fill = (chemical)), position = position_dodge(), fun = "mean", geom = "bar") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = position_dodge()) +
+  theme_bw() +
+  labs(title = "", 
+       y = "Growth Index", 
+       x = "Chemical",
+       fill = "Chemical") +
+  scale_fill_manual(values = c("goldenrod3", "royalblue1", "slateblue1", "springgreen4")) +
+  facet_grid(generation ~ salinity, ) +
+  ylim(c(0, 0.6)) +
+  theme(axis.text.x= element_blank(), plot.title = element_text(hjust = 0.5, size = 18), 
+        legend.text=element_text(size=12), legend.title=element_text(size=14), 
+        axis.text.y= element_text(size=10), axis.ticks.x = element_blank(), axis.title.y = element_text(size = 14),  axis.title.x = element_text(size = 14), strip.text.x = element_text(size = 14), strip.text.y = element_text(size = 14))
+
+ggsave("larvae_growth.png", height = 4, width  = 6)
+
+
+```
